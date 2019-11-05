@@ -1,4 +1,4 @@
-# * In this challenge, you are tasked with helping a small, rural town modernize its vote-counting process. (Up until now, Uncle Cleetus had been trustfully tallying them one-by-one, but unfortunately, his concentration isn't what it used to be.)
+# In this challenge, you are tasked with helping a small, rural town modernize its vote-counting process. (Up until now, Uncle Cleetus had been trustfully tallying them one-by-one, but unfortunately, his concentration isn't what it used to be.)
 
 # * You will be give a set of poll data called [election_data.csv](PyPoll/Resources/election_data.csv). The dataset is composed of three columns: `Voter ID`, `County`, and `Candidate`. Your task is to create a Python script that analyzes the votes and calculates each of the following:
 
@@ -30,70 +30,79 @@
 
 # * In addition, your final script should both print the analysis to the terminal and export a text file with the results.
 
-
+#importing the necessary modules
 import os
 import csv
 
-bank = os.path.join("Resources","budget_data.csv")
+#creating a variable that stores the path to the datafile for ease of use
+polls = os.path.join("Resources","election_data.csv")
 
-totalmonths = 0
-totalamount = 0
-#averagechange = totalamount/totalmonths
-greatestincrease = 0
-greatestdecrease = 0
-previousamount = 0
-firstamount = 0
-lastamount = 0
+#defining variables needed
+totalvotes = 0
+candidates = dict()
 
+mostvotes = 0
+winner = ""
+
+
+#setting a function that will automatically print out the stats once the for loop is done
 def pollstats():
-    print("Financial Analysis")
+    print("Election Results")
     print("-------------------------")
-    print(f"Total Months: {str(totalmonths)}")
-    print(f"Total: ${str(totalamount)}")
-    print(f"Average Change: ${str(round((lastamount - firstamount)/(totalmonths - 1),2))}")
-    print(f"Greatest Increase in Profits: {dategreat} (${str(greatestincrease)})")
-    print(f"Greatest Decrease in Profits: {dateleast} (${str(greatestdecrease)})")
+    print(f"Total Votes: {str(totalvotes)}")
+    print("-------------------------")
+    for key, value in candidates.items():
+        print(f"{key}: {round(value[0],3)}% ({round(value[1])})")
+    print("-------------------------")
+    print(f"Winner: {winner}")
+    print("-------------------------")
 
 
-
-with open(bank, 'r') as csvfile:
+#opening the file using previously set variable for path
+with open(polls, 'r') as csvfile:
     
+    #telling the csvreader that the delimiter for that file is a comma
     csvreader = csv.reader(csvfile,delimiter=",")
  
-
+    #skipping the header line since we don't really need it here
     next(csvreader)
     
-
+    #for loop to run through operations for each row in the csv
     for row in csvreader:
-        if csvreader.line_num == 2:
-            firstamount = int(row[1])
+        #incrementing the number of total votes per row
+        totalvotes+= 1
+        #candidatepercentage = candidates[row[2]][1]/totalvotes
+        candidatevotes = 1
 
-        else:
-            lastamount = int(row[1])
+        if row[2] not in candidates:
+            candidates[row[2]] = [0, candidatevotes]
         
-        totalmonths += 1
-        totalamount += int(row[1])
-        increase = int(row[1]) - previousamount
-        previousamount = int(row[1])
+        else:
+            candidates[row[2]][1] += 1
+            candidates[row[2]][0] = (candidates[row[2]][1]/totalvotes) * 100
 
-        if increase > greatestincrease:
-            greatestincrease = increase
-            dategreat = row[0]
-        if increase < greatestdecrease:
-            greatestdecrease = increase
-            dateleast = row[0]
+for key, value in candidates.items():
+    if int(value[1]) > mostvotes:
+        mostvotes = value[1]
+        winner = key
 
 
-bankstats()
-
+#calling our function to print out the stats to the terminal
+pollstats()
+print(candidates)
+#setting the output file path
 output_file = os.path.join("output.txt")
 
+#making the output file and setting it to write mode to write data
 with open(output_file, "w", newline="") as datafile:
 
-    datafile.write("Financial Analysis \n")
-    datafile.write("-------------------------\n")
-    datafile.write(f"Total Months: {str(totalmonths)}\n")
-    datafile.write(f"Total: ${str(totalamount)}\n")
-    datafile.write(f"Average Change: ${str(round((lastamount - firstamount)/(totalmonths - 1),2))}\n")
-    datafile.write(f"Greatest Increase in Profits: {dategreat} (${str(greatestincrease)})\n")
-    datafile.write(f"Greatest Decrease in Profits: {dateleast} (${str(greatestdecrease)})\n")
+    #writing the data to the new file we just created
+    datafile.write("Election Results \n")
+    datafile.write("--------------------------\n")
+    datafile.write(f"Total Votes: {str(totalvotes)}\n")
+    datafile.write("--------------------------\n")
+    for key, value in candidates.items():
+        datafile.write(f"{key}: {round(value[0],3)}% ({round(value[1])})\n")
+    datafile.write("--------------------------\n")
+    datafile.write(f"Winner: {winner}\n")
+    datafile.write("--------------------------")
