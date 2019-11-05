@@ -63,8 +63,8 @@ with open(polls, 'r') as csvfile:
     #telling the csvreader that the delimiter for that file is a comma
     csvreader = csv.reader(csvfile,delimiter=",")
  
-    #skipping the header line since we don't really need it here
-    next(csvreader)
+    #keeping the header line, but not doing anything with it since we don't really need it here
+    header = next(csvreader)
     
     #for loop to run through operations for each row in the csv
     for row in csvreader:
