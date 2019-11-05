@@ -40,7 +40,6 @@ polls = os.path.join("Resources","election_data.csv")
 #defining variables needed
 totalvotes = 0
 candidates = dict()
-
 mostvotes = 0
 winner = ""
 
@@ -52,7 +51,7 @@ def pollstats():
     print(f"Total Votes: {str(totalvotes)}")
     print("-------------------------")
     for key, value in candidates.items():
-        print(f"{key}: {round(value[0],3)}% ({round(value[1])})")
+        print(f"{key}: {round(value[0],3)}00% ({value[1]})")
     print("-------------------------")
     print(f"Winner: {winner}")
     print("-------------------------")
@@ -71,16 +70,20 @@ with open(polls, 'r') as csvfile:
     for row in csvreader:
         #incrementing the number of total votes per row
         totalvotes+= 1
-        #candidatepercentage = candidates[row[2]][1]/totalvotes
+        #setting a default to 1 so that way later on we just increment on that without interrupting the data
         candidatevotes = 1
 
+        #checking if the candidate is in the dictionary. If it's not then we add them
         if row[2] not in candidates:
+            #the first value is being set to zero for the candidate percentage until we get more data
             candidates[row[2]] = [0, candidatevotes]
-        
+        #if they are in the dictionary then we update their info
         else:
+            #updating the candidate vote first before the percentage so it is accurate
             candidates[row[2]][1] += 1
             candidates[row[2]][0] = (candidates[row[2]][1]/totalvotes) * 100
 
+#checking for who is the winner by going through the dictionary
 for key, value in candidates.items():
     if int(value[1]) > mostvotes:
         mostvotes = value[1]
@@ -89,7 +92,9 @@ for key, value in candidates.items():
 
 #calling our function to print out the stats to the terminal
 pollstats()
-print(candidates)
+
+# print(candidates) was being used to check the dictionary before output
+
 #setting the output file path
 output_file = os.path.join("output.txt")
 
@@ -102,7 +107,7 @@ with open(output_file, "w", newline="") as datafile:
     datafile.write(f"Total Votes: {str(totalvotes)}\n")
     datafile.write("--------------------------\n")
     for key, value in candidates.items():
-        datafile.write(f"{key}: {round(value[0],3)}% ({round(value[1])})\n")
+        datafile.write(f"{key}: {round(value[0],3)}00% ({value[1]})\n")
     datafile.write("--------------------------\n")
     datafile.write(f"Winner: {winner}\n")
     datafile.write("--------------------------")
